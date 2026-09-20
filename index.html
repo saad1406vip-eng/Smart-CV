@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#f0f4f8">
+<title>مُحرِّر الوثائق الذكي - تجمع عسير الصحي</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#f4f7fc;
+  --surface:#ffffff;
+  --surface2:#eef2f8;
+  --accent:#1e3a5f;
+  --accent2:#2c5282;
+  --gold:#c8a96e;
+  --text:#1a202c;
+  --text2:#4a5568;
+  --text3:#a0aec0;
+  --border:#e2e8f0;
+  --green:#38a169;
+  --red:#e53e3e;
+  --blue:#3182ce;
+  --shadow:0 4px 16px rgba(0,0,0,0.06);
+  --radius:14px;
+  --radius-sm:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Cairo','Noto Naskh Arabic',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* Header */
+.app-header{background:var(--surface);border-bottom:1px solid var(--border);padding:12px 16px 0;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.04)}
+.header-title{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.header-title .icon{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;color:white}
+.header-title h1{font-size:18px;font-weight:700;color:var(--accent)}
+.header-title p{font-size:11px;color:var(--text2);margin-top:1px}
+
+/* Tabs */
+.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding-bottom:0}
+.tabs::-webkit-scrollbar{display:none}
+.tab-btn{flex-shrink:0;padding:8px 14px;background:transparent;border:none;border-bottom:3px solid transparent;color:var(--text3);font-family:'Cairo',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab-btn:hover:not(.active){color:var(--text2)}
+
+/* Content */
+.tab-content{display:none;padding:16px}
+.tab-content.active{display:block}
+
+/* Card */
+.section-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:14px;box-shadow:var(--shadow)}
+.section-title{font-size:14px;font-weight:700;color:var(--accent);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.section-title::before{content:'';width:3px;height:16px;background:var(--gold);border-radius:2px;flex-shrink:0}
+
+/* Form */
+.form-group{margin-bottom:12px;position:relative}
+label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px}
+input[type="text"],input[type="date"],input[type="number"],textarea,select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;color:var(--text);font-family:'Cairo',sans-serif;font-size:13px;outline:none;transition:border-color .2s;direction:rtl}
+input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(30,58,95,0.08)}
+textarea{resize:vertical;min-height:80px}
+select option{background:#fff;color:#1a202c}
+.row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* Combo (select + custom input) */
+.combo-wrap{position:relative}
+.combo-wrap select{width:100%;padding-left:36px}
+.combo-custom{margin-top:6px;display:none}
+.combo-custom.show{display:block}
+.combo-toggle{position:absolute;top:50%;left:10px;transform:translateY(-50%);background:none;border:none;color:var(--accent);font-size:16px;cursor:pointer;z-index:2;line-height:1}
+
+/* Primary/Secondary */
+.btn-primary{width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:var(--radius-sm);color:#fff;font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;margin-top:6px}
+.btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+.btn-secondary{width:100%;padding:11px;background:transparent;border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text2);font-family:'Cairo',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;margin-top:6px}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+
+/* Photo Upload */
+.photo-upload-area{border:2px dashed var(--border);border-radius:var(--radius);padding:20px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.photo-upload-area:hover{border-color:var(--gold);background:rgba(200,169,110,0.05)}
+.photo-upload-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.photo-preview{width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid var(--gold);margin:0 auto 8px;display:block}
+.photo-placeholder{font-size:36px;margin-bottom:8px}
+.photo-upload-text{font-size:12px;color:var(--text2)}
+.photo-remove{display:none;margin:8px auto 0;padding:4px 12px;background:rgba(229,62,62,.08);border:1px solid rgba(229,62,62,.2);border-radius:20px;color:var(--red);font-size:11px;cursor:pointer;font-family:'Cairo',sans-serif}
+
+/* Tags */
+.tags-container{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tag{display:flex;align-items:center;gap:4px;padding:4px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;font-size:12px;color:var(--text)}
+.tag .remove-tag{background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;line-height:1;padding:0;margin-right:2px}
+.tag-input-row{display:flex;gap:8px}
+.tag-input-row input{flex:1}
+.tag-input-row button{padding:0 14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--accent);font-size:20px;cursor:pointer}
+
+/* Exp Entry */
+.exp-entry{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;margin-bottom:8px;position:relative}
+.exp-entry .remove-exp{position:absolute;top:8px;left:8px;background:rgba(229,62,62,.08);border:1px solid rgba(229,62,62,.2);border-radius:4px;color:var(--red);cursor:pointer;font-size:11px;padding:2px 6px;font-family:'Cairo',sans-serif}
+.add-exp-btn{width:100%;padding:9px;background:transparent;border:1px dashed var(--border);border-radius:var(--radius-sm);color:var(--text2);font-family:'Cairo',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;margin-top:4px}
+.add-exp-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* Summary */
+.summary-nav{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;scrollbar-width:none}
+.summary-nav::-webkit-scrollbar{display:none}
+.sum-tab{flex-shrink:0;padding:7px 14px;background:var(--surface);border:1px solid var(--border);border-radius:20px;color:var(--text2);font-family:'Cairo',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s}
+.sum-tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.preview-frame{background:white;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);border:1px solid var(--border)}
+.action-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+
+/* Toast */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--accent);border-radius:20px;padding:10px 20px;font-size:13px;color:#fff;z-index:9999;opacity:0;pointer-events:none;transition:opacity .3s;white-space:nowrap}
+.toast.show{opacity:1}
+
+/* ══════════ PRINT PREVIEWS — WHITE CLEAN ══════════ */
+/* CV Preview */
+.cv-wrap{background:#fff;font-family:'Cairo','Noto Naskh Arabic',sans-serif;direction:rtl;color:#1a1a2e}
+.cv-hdr{background:#1e3a5f;color:#fff;padding:22px 24px 18px;display:flex;gap:18px;align-items:flex-start}
+.cv-hdr-photo{width:88px;height:88px;border-radius:50%;object-fit:cover;border:3px solid #c8a96e;flex-shrink:0}
+.cv-hdr-photo-placeholder{width:88px;height:88px;border-radius:50%;background:rgba(200,169,110,.2);border:3px solid #c8a96e;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:32px}
+.cv-hdr-info{flex:1}
+.cv-hdr-name{font-size:22px;font-weight:900;color:#c8a96e;line-height:1.2}
+.cv-hdr-title{font-size:13px;color:rgba(255,255,255,.8);margin-top:4px}
+.cv-hdr-contacts{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+.cv-hdr-contact{font-size:11px;color:rgba(255,255,255,.75);display:flex;align-items:center;gap:4px}
+.cv-body{padding:16px 20px}
+.cv-sec{margin-bottom:16px;page-break-inside:avoid}
+.cv-sec-title{font-size:12px;font-weight:700;color:#1e3a5f;border-bottom:2px solid #c8a96e;padding-bottom:4px;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px}
+.cv-item{margin-bottom:10px}
+.cv-item-hd{font-size:13px;font-weight:700;color:#1e3a5f}
+.cv-item-sub{font-size:11px;color:#666;margin-top:2px}
+.cv-item-desc{font-size:12px;color:#444;margin-top:4px;line-height:1.7}
+.cv-skills-grid{display:flex;flex-wrap:wrap;gap:6px}
+.cv-skill-tag{padding:3px 10px;background:#eef2f8;border:1px solid #c8d4e8;border-radius:20px;font-size:11px;color:#1e3a5f;font-weight:600}
+
+/* Certificate Preview */
+.cert-wrap{background:#fff;font-family:'Noto Naskh Arabic','Cairo',sans-serif;direction:rtl;padding:24px}
+.cert-outer{border:3px solid #c8a96e;border-radius:12px;padding:18px;position:relative}
+.cert-inner{border:1px solid rgba(200,169,110,.35);border-radius:8px;padding:18px;text-align:center}
+.cert-corner{position:absolute;font-size:20px;color:rgba(200,169,110,.5)}
+.cert-corner.tl{top:8px;right:8px}
+.cert-corner.tr{top:8px;left:8px}
+.cert-corner.bl{bottom:8px;right:8px}
+.cert-corner.br{bottom:8px;left:8px}
+.cert-logo-lrg{font-size:40px;margin-bottom:4px}
+.cert-org-name{font-size:15px;font-weight:700;color:#1e3a5f;margin-bottom:2px}
+.cert-org-sub{font-size:11px;color:#888;margin-bottom:14px}
+.cert-divider{width:80px;height:2px;background:linear-gradient(90deg,transparent,#c8a96e,transparent);margin:0 auto 14px}
+.cert-badge{font-size:20px;font-weight:900;color:#c8a96e;letter-spacing:2px;margin-bottom:14px}
+.cert-text{font-size:14px;color:#333;line-height:2;margin-bottom:12px}
+.cert-recip-name{font-size:22px;font-weight:700;color:#1e3a5f;border-bottom:2px solid #c8a96e;padding-bottom:3px;display:inline-block;margin:4px 0 2px}
+.cert-recip-job{font-size:12px;color:#666;margin-bottom:10px}
+.cert-reason-text{font-size:13px;color:#444;line-height:2;background:#fffdf7;border-right:3px solid #c8a96e;padding:10px 12px;border-radius:0 6px 6px 0;text-align:right;margin:10px 0}
+.cert-ornament{font-size:16px;color:rgba(200,169,110,.5);letter-spacing:8px;margin:8px 0}
+.cert-footer{display:flex;justify-content:space-between;align-items:flex-end;margin-top:18px;padding-top:12px;border-top:1px solid rgba(200,169,110,.25)}
+.cert-sig{text-align:center}
+.cert-sig-line{width:100px;height:1px;background:#aaa;margin:24px auto 4px}
+.cert-sig-name{font-size:12px;font-weight:700;color:#1e3a5f}
+.cert-sig-role{font-size:10px;color:#888}
+.cert-date-block{text-align:center;font-size:11px;color:#666;line-height:1.8}
+
+/* Letter Preview */
+.ltr-wrap{background:#fff;font-family:'Noto Naskh Arabic','Cairo',sans-serif;direction:rtl;color:#1a1a2e;padding:0}
+.ltr-top-bar{background:#1e3a5f;padding:16px 22px;display:flex;justify-content:space-between;align-items:center}
+.ltr-sender-name{font-size:15px;font-weight:700;color:#c8a96e}
+.ltr-sender-id{font-size:11px;color:rgba(255,255,255,.7);margin-top:2px}
+.ltr-meta{text-align:left;font-size:11px;color:rgba(255,255,255,.6);line-height:1.8}
+.ltr-body-pad{padding:18px 22px}
+.ltr-bismillah{text-align:center;font-size:15px;color:#1e3a5f;margin-bottom:14px;font-weight:600}
+.ltr-to-block{background:#f7f4ef;border-right:3px solid #c8a96e;padding:10px 14px;border-radius:0 6px 6px 0;margin-bottom:14px}
+.ltr-to-label{font-size:10px;color:#888;margin-bottom:3px}
+.ltr-to-val{font-size:13px;font-weight:700;color:#1e3a5f}
+.ltr-subject-box{background:#f0eee8;border:1px solid rgba(200,169,110,.4);border-radius:6px;padding:10px 14px;text-align:center;margin-bottom:16px}
+.ltr-subject-label{font-size:10px;color:#888;display:block;margin-bottom:2px}
+.ltr-subject-val{font-size:14px;font-weight:700;color:#1e3a5f}
+.ltr-body-text{font-size:14px;color:#222;line-height:2.1;margin-bottom:20px;text-align:justify;white-space:pre-wrap}
+.ltr-sig-block{text-align:right;padding-top:8px}
+.ltr-sig-line{width:110px;height:1px;background:#bbb;margin:24px 0 6px auto}
+.ltr-sig-name{font-size:13px;font-weight:700;color:#1e3a5f}
+.ltr-sig-details{font-size:11px;color:#666;line-height:1.8}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+  <div class="header-title">
+    <div class="icon">📋</div>
+    <div>
+      <h1>مُحرِّر الوثائق الذكي</h1>
+      <p>سيرة ذاتية · شهادات · خطابات - تجمع عسير الصحي</p>
+    </div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('cv')">👤 السيرة الذاتية</button>
+    <button class="tab-btn" onclick="switchTab('cert')">🏅 شهادة شكر</button>
+    <button class="tab-btn" onclick="switchTab('letter')">✉️ خطاب رسمي</button>
+    <button class="tab-btn" onclick="switchTab('summary')">📄 الملخص</button>
+  </div>
+</div>
+
+<!-- ═══════ TAB 1: CV ═══════ -->
+<div id="tab-cv" class="tab-content active">
+
+  <!-- Photo -->
+  <div class="section-card">
+    <div class="section-title">الصورة الشخصية</div>
+    <div class="photo-upload-area" id="photo-area" onclick="triggerPhoto()">
+      <input type="file" id="photo-input" accept="image/*" onchange="loadPhoto(event)">
+      <div id="photo-placeholder-wrap">
+        <div class="photo-placeholder">📷</div>
+        <div class="photo-upload-text">اضغط لرفع صورة شخصية<br><small style="color:var(--text3)">JPG · PNG · WEBP</small></div>
+      </div>
+      <img id="photo-img" class="photo-preview" src="" alt="" style="display:none">
+    </div>
+    <button class="photo-remove" id="photo-remove-btn" onclick="removePhoto()">✕ حذف الصورة</button>
+  </div>
+
+  <!-- Personal Info -->
+  <div class="section-card">
+    <div class="section-title">المعلومات الشخصية</div>
+    <div class="form-group">
+      <label>الاسم الكامل</label>
+      <input type="text" id="cv-name" placeholder="مثال: سعد علي سعد القرني">
+    </div>
+    <div class="form-group">
+      <label>المسمى الوظيفي / التخصص</label>
+      <div class="combo-wrap">
+        <select id="cv-jobtitle-sel" onchange="comboSel('cv-jobtitle')">
+          <option value="">— اختر أو اكتب —</option>
+          <option>مشرف فنيي المختبر</option><option>فني مختبر طبي</option>
+          <option>طبيب عام</option><option>طبيب متخصص</option>
+          <option>صيدلاني</option><option>ممرض / ممرضة</option>
+          <option>أخصائي أشعة</option><option>أخصائي تخدير</option>
+          <option>أخصائي موارد بشرية</option><option>محاسب</option>
+          <option>مهندس</option><option>معلم / معلمة</option>
+          <option>إداري</option><option>مدير مشروع</option>
+          <option value="__custom__">أكتب مسمى آخر...</option>
+        </select>
+        <input type="text" id="cv-jobtitle" class="combo-custom" placeholder="اكتب المسمى الوظيفي...">
+      </div>
+    </div>
+    <div class="row-2">
+      <div class="form-group">
+        <label>رقم الجوال</label>
+        <input type="text" id="cv-phone" placeholder="05xxxxxxxx">
+      </div>
+      <div class="form-group">
+        <label>البريد الإلكتروني</label>
+        <input type="text" id="cv-email" placeholder="name@email.com">
+      </div>
+    </div>
+    <div class="row-2">
+      <div class="form-group">
+        <label>المدينة</label>
+        <div class="combo-wrap">
+          <select id="cv-city-sel" onchange="comboSel('cv-city')">
+            <option value="">— اختر —</option>
+            <option>الرياض</option><option>جدة</option><option>مكة المكرمة</option>
+            <option>المدينة المنورة</option><option>الدمام</option><option>الخبر</option>
+            <option>أبها</option><option>خميس مشيط</option><option>بلقرن</option>
+            <option>سبت العلايا</option><option>القنفذة</option><option>النماص</option>
+            <option>بيشة</option><option>الطائف</option><option>تبوك</option>
+            <option value="__custom__">أكتب مدينة أخرى...</option>
+          </select>
+          <input type="text" id="cv-city" class="combo-custom" placeholder="اكتب المدينة...">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>الجنسية</label>
+        <div class="combo-wrap">
+          <select id="cv-nationality-sel" onchange="comboSel('cv-nationality')">
+            <option value="">— اختر —</option>
+            <option>سعودي</option><option>سعودية</option>
+            <option value="__custom__">أكتب...</option>
+          </select>
+          <input type="text" id="cv-nationality" class="combo-custom" placeholder="الجنسية...">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="section-card">
+    <div class="section-title">الملخص المهني</div>
+    <div class="form-group">
+      <label>اختر ملخصاً جاهزاً حسب التخصص</label>
+      <select id="cv-summary-preset" onchange="applySummaryPreset()">
+        <option value="">— اختر نموذجاً —</option>
+        <option value="health">🏥 نموذج طبي / صحي</option>
+        <option value="admin">📋 نموذج إداري</option>
+        <option value="tech">💻 نموذج تقني / هندسي</option>
+        <option value="edu">🎓 نموذج تعليمي</option>
+        <option value="general">📄 نموذج عام</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>نص الملخص (يمكنك التعديل)</label>
+      <textarea id="cv-summary" rows="4" placeholder="اكتب نبذة قصيرة عن نفسك..."></textarea>
+    </div>
+  </div>
+
+  <!-- Experiences -->
+  <div class="section-card">
+    <div class="section-title">الخبرات الوظيفية</div>
+    <div id="exp-list"></div>
+    <button class="add-exp-btn" onclick="addExp()">+ إضافة خبرة وظيفية</button>
+  </div>
+
+  <!-- Education -->
+  <div class="section-card">
+    <div class="section-title">المؤهلات العلمية</div>
+    <div id="edu-list"></div>
+    <button class="add-exp-btn" onclick="addEdu()">+ إضافة مؤهل علمي</button>
+  </div>
+
+  <!-- Skills -->
+  <div class="section-card">
+    <div class="section-title">المهارات والكفاءات</div>
+    <div class="form-group">
+      <label>اختر مهارة أو أضف مهارة مخصصة</label>
+      <select id="skill-sel" onchange="addSkillFromSel()">
+        <option value="">— اختر مهارة للإضافة —</option>
+        <optgroup label="مهارات تقنية">
+          <option>برامج Microsoft Office</option><option>Excel المتقدم</option>
+          <option>إدارة قواعد البيانات</option><option>أنظمة HIS المستشفيات</option>
+          <option>أجهزة التحليل الطبي</option><option>LIS نظام معلومات المختبر</option>
+        </optgroup>
+        <optgroup label="مهارات إدارية">
+          <option>إدارة الفرق</option><option>التخطيط الاستراتيجي</option>
+          <option>إعداد التقارير</option><option>إدارة الوقت</option>
+          <option>حل المشكلات</option><option>اتخاذ القرار</option>
+        </optgroup>
+        <optgroup label="مهارات شخصية">
+          <option>التواصل الفعّال</option><option>العمل ضمن فريق</option>
+          <option>القيادة</option><option>الدقة في العمل</option>
+          <option>الالتزام بالمواعيد</option><option>التعلم الذاتي</option>
+        </optgroup>
+        <optgroup label="لغات">
+          <option>اللغة العربية (لغة أم)</option><option>اللغة الإنجليزية</option>
+          <option>اللغة الفرنسية</option><option>اللغة الأردية</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="tag-input-row">
+      <input type="text" id="skill-input" placeholder="أو اكتب مهارة مخصصة..." onkeydown="if(event.key==='Enter')addSkill()">
+      <button onclick="addSkill()">+</button>
+    </div>
+    <div class="tags-container" id="skills-tags"></div>
+  </div>
+
+  <!-- Courses -->
+  <div class="section-card">
+    <div class="section-title">الدورات والشهادات</div>
+    <div id="course-list"></div>
+    <button class="add-exp-btn" onclick="addCourse()">+ إضافة دورة / شهادة</button>
+  </div>
+
+  <button class="btn-primary" onclick="switchTab('summary');showSummary('cv')">معاينة السيرة الذاتية 👁</button>
+</div>
+
+<!-- ═══════ TAB 2: CERTIFICATE ═══════ -->
+<div id="tab-cert" class="tab-content">
+
+  <div class="section-card">
+    <div class="section-title">جهة الإصدار</div>
+    <div class="form-group">
+      <label>اسم الجهة / المنظمة</label>
+      <div class="combo-wrap">
+        <select id="cert-org-sel" onchange="comboSel('cert-org')">
+          <option value="">— اختر أو اكتب —</option>
+          <option>مستشفى سبت العلايا العام</option>
+          <option>تجمع عسير الصحي</option>
+          <option>وزارة الصحة</option>
+          <option>وزارة التعليم</option>
+          <option>وزارة الموارد البشرية</option>
+          <option>الرئاسة العامة للأمن</option>
+          <option>أمانة منطقة عسير</option>
+          <option value="__custom__">اكتب اسم الجهة...</option>
+        </select>
+        <input type="text" id="cert-org" class="combo-custom" placeholder="اكتب اسم الجهة...">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>الشعار / الرمز (إيموجي)</label>
+      <div class="combo-wrap">
+        <select id="cert-logo-sel" onchange="comboSel('cert-logo')">
+          <option value="🏥">🏥 مستشفى / صحة</option>
+          <option value="🎓">🎓 تعليم</option>
+          <option value="🏛">🏛 جهة حكومية</option>
+          <option value="⚕️">⚕️ طبي</option>
+          <option value="🌟">🌟 تميز</option>
+          <option value="🏆">🏆 إنجاز</option>
+          <option value="📋">📋 إداري</option>
+          <option value="__custom__">اكتب رمز آخر...</option>
+        </select>
+        <input type="text" id="cert-logo" class="combo-custom" placeholder="أدخل إيموجي أو نص...">
+      </div>
+    </div>
+    <div class="row-2">
+      <div class="form-group">
+        <label>اسم الموقّع</label>
+        <input type="text" id="cert-signer" placeholder="د. محمد العمري">
+      </div>
+      <div class="form-group">
+        <label>منصب الموقّع</label>
+        <div class="combo-wrap">
+          <select id="cert-signer-title-sel" onchange="comboSel('cert-signer-title')">
+            <option value="">— اختر —</option>
+            <option>المدير العام</option><option>مدير المستشفى</option>
+            <option>رئيس القسم</option><option>المشرف العام</option>
+            <option>المدير التنفيذي</option><option>الوكيل المساعد</option>
+            <option value="__custom__">اكتب المنصب...</option>
+          </select>
+          <input type="text" id="cert-signer-title" class="combo-custom" placeholder="المنصب الوظيفي...">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-title">بيانات المُكرَّم</div>
+    <div class="form-group">
+      <label>اسم المُكرَّم</label>
+      <input type="text" id="cert-recipient" placeholder="الاسم الكامل">
+    </div>
+    <div class="form-group">
+      <label>وظيفته / تخصصه</label>
+      <div class="combo-wrap">
+        <select id="cert-recipient-job-sel" onchange="comboSel('cert-recipient-job')">
+          <option value="">— اختر أو اكتب —</option>
+          <option>فني مختبر طبي</option><option>مشرف فنيي المختبر</option>
+          <option>ممرض / ممرضة</option><option>طبيب</option><option>صيدلاني</option>
+          <option>إداري</option><option>موظف</option><option>معلم</option>
+          <option>مهندس</option><option>متطوع</option>
+          <option value="__custom__">اكتب التخصص...</option>
+        </select>
+        <input type="text" id="cert-recipient-job" class="combo-custom" placeholder="اكتب الوظيفة...">
+      </div>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-title">سبب الشكر والتقدير</div>
+    <div class="form-group">
+      <label>نوع الشهادة</label>
+      <select id="cert-type">
+        <option value="شكر وتقدير">🏅 شكر وتقدير</option>
+        <option value="تميز وإبداع">⭐ تميز وإبداع</option>
+        <option value="مشاركة فعّالة">🤝 مشاركة فعّالة</option>
+        <option value="إتمام دورة تدريبية">📚 إتمام دورة تدريبية</option>
+        <option value="خدمات جليلة">💎 خدمات جليلة</option>
+        <option value="التفاني في العمل">💪 التفاني في العمل</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>اختر نصاً جاهزاً لسبب التكريم</label>
+      <select id="cert-reason-preset" onchange="applyCertPreset()">
+        <option value="">— اختر نموذجاً —</option>
+        <option value="general">🏅 شكر عام</option>
+        <option value="effort">💪 تقدير للجهود</option>
+        <option value="training">📚 إتمام دورة تدريبية</option>
+        <option value="excellence">⭐ تميز وإبداع</option>
+        <option value="long_service">💎 خدمات طويلة</option>
+        <option value="team">🤝 عمل جماعي</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>سبب / مناسبة التكريم (يمكنك التعديل)</label>
+      <textarea id="cert-reason" rows="3" placeholder="اكتب السبب باختصار..."></textarea>
+    </div>
+    <div class="row-2" style="margin-top:10px">
+      <div class="form-group">
+        <label>التاريخ الميلادي</label>
+        <input type="date" id="cert-date">
+      </div>
+      <div class="form-group">
+        <label>التاريخ الهجري</label>
+        <input type="text" id="cert-hijri" placeholder="١٤٤٦/١٠/١٠ هـ">
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-primary" onclick="switchTab('summary');showSummary('cert')">معاينة الشهادة 👁</button>
+</div>
+
+<!-- ═══════ TAB 3: LETTER ═══════ -->
+<div id="tab-letter" class="tab-content">
+
+  <div class="section-card">
+    <div class="section-title">بيانات مُقدِّم الخطاب</div>
+    <div class="row-2">
+      <div class="form-group">
+        <label>الاسم الكامل</label>
+        <input type="text" id="ltr-name" placeholder="الاسم الثلاثي أو الرباعي">
+      </div>
+      <div class="form-group">
+        <label>رقم الهوية الوطنية</label>
+        <input type="text" id="ltr-id" placeholder="1xxxxxxxxx">
+      </div>
+    </div>
+    <div class="row-2">
+      <div class="form-group">
+        <label>رقم الجوال</label>
+        <input type="text" id="ltr-phone" placeholder="05xxxxxxxx">
+      </div>
+      <div class="form-group">
+        <label>المدينة / المنطقة</label>
+        <div class="combo-wrap">
+          <select id="ltr-city-sel" onchange="comboSel('ltr-city')">
+            <option value="">— اختر —</option>
+            <option>الرياض</option><option>جدة</option><option>أبها</option>
+            <option>خميس مشيط</option><option>بلقرن</option><option>سبت العلايا</option>
+            <option>النماص</option><option>بيشة</option><option>القنفذة</option>
+            <option>الدمام</option><option>الطائف</option><option>تبوك</option>
+            <option value="__custom__">اكتب المدينة...</option>
+          </select>
+          <input type="text" id="ltr-city" class="combo-custom" placeholder="المدينة...">
+        </div>
+      </div>
+    </div>
+    <div class="row-2">
+      <div class="form-group">
+        <label>الحالة الوظيفية</label>
+        <select id="ltr-emp-status">
+          <option value="">— اختر —</option>
+          <option>موظف حكومي</option><option>موظف قطاع خاص</option>
+          <option>مواطن (غير موظف)</option><option>متقاعد</option>
+          <option>طالب</option><option>صاحب عمل</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>جهة العمل (إن وجدت)</label>
+        <input type="text" id="ltr-work-org" placeholder="اسم المستشفى / الجهة">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>التاريخ</label>
+      <input type="date" id="ltr-date">
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-title">الجهة المُرسَل إليها</div>
+    <div class="form-group">
+      <label>نوع الجهة</label>
+      <div class="combo-wrap">
+        <select id="ltr-to-type-sel" onchange="comboSel('ltr-to-type')">
+          <option value="">— اختر الجهة —</option>
+          <optgroup label="جهات صحية">
+            <option>وزارة الصحة</option><option>تجمع عسير الصحي</option>
+            <option>مستشفى سبت العلايا العام</option><option>مدير المستشفى</option>
+          </optgroup>
+          <optgroup label="جهات حكومية">
+            <option>إمارة منطقة عسير</option><option>أمانة منطقة عسير</option>
+            <option>وزارة الموارد البشرية</option><option>وزارة التعليم</option>
+            <option>وزارة الداخلية</option><option>وزارة العدل</option>
+            <option>ديوان المظالم</option><option>هيئة حقوق الإنسان</option>
+            <option>النيابة العامة</option>
+          </optgroup>
+          <optgroup label="جهات خاصة / أخرى">
+            <option>شركة خاصة</option><option>مكتب خاص</option>
+            <option value="__custom__">اكتب الجهة...</option>
+          </optgroup>
+        </select>
+        <input type="text" id="ltr-to-type" class="combo-custom" placeholder="اكتب اسم الجهة...">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>صيغة المخاطَب</label>
+      <div class="combo-wrap">
+        <select id="ltr-to-title-sel" onchange="comboSel('ltr-to-title')">
+          <option value="">— اختر —</option>
+          <option>معالي الوزير / حفظه الله</option>
+          <option>سعادة المدير العام / حفظه الله</option>
+          <option>سعادة مدير المستشفى / حفظه الله</option>
+          <option>فضيلة الشيخ / حفظه الله</option>
+          <option>صاحب السمو الأمير / حفظه الله</option>
+          <option>السيد المدير / المحترم</option>
+          <option value="__custom__">اكتب الصيغة...</option>
+        </select>
+        <input type="text" id="ltr-to-title" class="combo-custom" placeholder="صيغة التحية...">
+      </div>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-title">موضوع الخطاب ومحتواه</div>
+    <div class="form-group">
+      <label>نوع الخطاب</label>
+      <select id="ltr-type">
+        <option value="طلب">📋 طلب</option>
+        <option value="شكوى">⚠️ شكوى</option>
+        <option value="تظلم">🔔 تظلم</option>
+        <option value="احتجاج">❗ احتجاج</option>
+        <option value="تصعيد">📢 تصعيد</option>
+        <option value="اعتذار">🤝 اعتذار</option>
+        <option value="استفسار">❓ استفسار</option>
+        <option value="مقترح">💡 مقترح</option>
+        <option value="توصية">⭐ توصية</option>
+        <option value="تعقيب">📝 تعقيب</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>موضوع الخطاب (عنوان مختصر)</label>
+      <div class="combo-wrap">
+        <select id="ltr-subject-sel" onchange="comboSel('ltr-subject')">
+          <option value="">— اختر أو اكتب —</option>
+          <option>طلب نقل خدمات</option><option>طلب إجازة اضطرارية</option>
+          <option>طلب صرف مستحقات مالية</option><option>طلب تسوية راتب</option>
+          <option>الاعتراض على قرار إداري</option><option>الشكوى من موظف</option>
+          <option>طلب إعادة نظر في قرار</option><option>طلب توثيق أو شهادة</option>
+          <option>طلب إجراء فحوصات طبية</option>
+          <option value="__custom__">اكتب موضوع آخر...</option>
+        </select>
+        <input type="text" id="ltr-subject" class="combo-custom" placeholder="اكتب موضوع الخطاب...">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>اختر نص خطاب جاهز</label>
+      <select id="ltr-body-preset" onchange="applyLetterPreset()">
+        <option value="">— اختر نموذجاً —</option>
+        <option value="transfer">📋 طلب نقل خدمات</option>
+        <option value="leave">📋 طلب إجازة اضطرارية</option>
+        <option value="salary">📋 طلب صرف مستحقات مالية</option>
+        <option value="complaint">⚠️ شكوى عامة</option>
+        <option value="grievance">🔔 تظلم من قرار</option>
+        <option value="inquiry">❓ استفسار عام</option>
+        <option value="thanks">🤝 خطاب شكر واعتذار</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>نص الخطاب النهائي (يمكنك التعديل مباشرة)</label>
+      <textarea id="ltr-body" rows="9" placeholder="سيظهر هنا نص الخطاب بعد اختيار النموذج، أو يمكنك الكتابة مباشرة..."></textarea>
+    </div>
+  </div>
+
+  <button class="btn-primary" onclick="switchTab('summary');showSummary('letter')">معاينة الخطاب 👁</button>
+</div>
+
+<!-- ═══════ TAB 4: SUMMARY ═══════ -->
+<div id="tab-summary" class="tab-content">
+  <div class="summary-nav">
+    <button class="sum-tab active" onclick="showSummary('cv')">👤 السيرة الذاتية</button>
+    <button class="sum-tab" onclick="showSummary('cert')">🏅 الشهادة</button>
+    <button class="sum-tab" onclick="showSummary('letter')">✉️ الخطاب</button>
+  </div>
+  <div class="preview-frame">
+    <div id="cv-preview"></div>
+    <div id="cert-preview" style="display:none"></div>
+    <div id="letter-preview" style="display:none"></div>
+  </div>
+  <div class="action-row">
+    <button class="btn-primary" style="margin-top:0" onclick="printDoc()">🖨 طباعة / PDF</button>
+    <button class="btn-primary" style="margin-top:0;background:linear-gradient(135deg,#25d366,#128c7e);color:white" onclick="shareWhatsApp()">📤 مشاركة واتساب</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════
+const S = {
+  photoDataURL: null,
+  cv: { skills: [], experiences: [], educations: [], courses: [] }
+};
+let activeDoc = 'cv';
+
+// ══════════════════════════════════════════
+//  UTILS
+// ══════════════════════════════════════════
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function gv(id) {
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+
+// Combo select handler
+function comboSel(baseId) {
+  const sel = document.getElementById(baseId + '-sel');
+  const custom = document.getElementById(baseId);
+  if (!sel || !custom) return;
+  if (sel.value === '__custom__') {
+    custom.classList.add('show');
+    custom.focus();
+    sel.value = '';
+  } else {
+    custom.classList.remove('show');
+    custom.value = sel.value;
+  }
+}
+
+function getComboVal(baseId) {
+  const custom = document.getElementById(baseId);
+  const sel = document.getElementById(baseId + '-sel');
+  if (custom && custom.classList.contains('show') && custom.value.trim()) return custom.value.trim();
+  if (custom && custom.value.trim()) return custom.value.trim();
+  if (sel && sel.value && !sel.value.startsWith('__custom__') && sel.value !== '') return sel.value;
+  return '';
+}
+
+// ══════════════════════════════════════════
+//  PRESET TEXTS (بدائل الذكاء الاصطناعي)
+// ══════════════════════════════════════════
+const SUMMARY_PRESETS = {
+  health: 'فني مختبر طبي محترف بخبرة عملية في إجراء التحاليل المخبرية الدقيقة، وتشغيل وصيانة أجهزة التحليل الطبي، وضبط الجودة المخبرية وفق معايير CBAHI. أمتلك مهارات عالية في استخدام أنظمة LIS وHIS، وأعمل بروح الفريق الواحد لضمان دقة النتائج وسرعة تسليمها.',
+  admin: 'إداري متمرس بخبرة في تنظيم العمل المكتبي، وإعداد التقارير، وإدارة الملفات، والتنسيق بين الأقسام. أتمتع بمهارات تواصل فعّالة، وقدرة على العمل تحت الضغط، وإتقان برامج Microsoft Office. أسعى دائماً لتطوير بيئة العمل وتحقيق الأهداف المؤسسية.',
+  tech: 'مهندس متخصص بخبرة في تصميم وتنفيذ المشاريع التقنية، وصيانة الأنظمة، وحل المشكلات الفنية. أمتلك مهارات تحليلية عالية، وقدرة على العمل ضمن فريق، وأحرص على مواكبة أحدث التقنيات لتحقيق أعلى معايير الجودة والكفاءة.',
+  edu: 'معلم مخلص بخبرة في تدريس المناهج التعليمية، وتنمية مهارات الطلاب، وإدارة الصف بفعالية. أستخدم أساليب تعليمية حديثة، وأتمتع بقدرة على التواصل مع الطلاب وأولياء الأمور، وأسعى لتحقيق التميز الأكاديمي والتربوي.',
+  general: 'موظف طموح ومجتهد، أمتلك مهارات تواصل جيدة، وقدرة على التعلم السريع، والعمل ضمن فريق. ألتزم بالدقة والمواعيد، وأسعى دائماً لتطوير مهاراتي والمساهمة في تحقيق أهداف جهة العمل.'
+};
+
+const CERT_PRESETS = {
+  general: 'تقديراً لجهودكم المتميزة وعطائكم المستمر، ومساهمتكم الفاعلة في تحقيق أهداف الجهة. نسأل الله لكم دوام التوفيق والنجاح.',
+  effort: 'تقديراً لما بذلتموه من جهد مخلص وعمل دؤوب خلال الفترة الماضية، وما أظهرتموه من تفانٍ وإخلاص في أداء مهامكم الوظيفية على أكمل وجه.',
+  training: 'تقديراً لإتمامكم البرنامج التدريبي بنجاح، وما أظهرتموه من التزام وجدية في التحصيل العلمي. نسأل الله لكم دوام التوفيق في مسيرتكم المهنية.',
+  excellence: 'تقديراً لتميزكم وإبداعكم في أداء المهام الموكلة إليكم، وتحقيقكم نتائج متميزة تفوق التوقعات. نتمنى لكم مزيداً من التقدم والنجاح.',
+  long_service: 'تقديراً لخدمتكم الطويلة والمخلصة التي امتدت لسنوات، وما قدمتموه من عطاء وإخلاص في خدمة الجهة والمرضى. نسأل الله لكم دوام الصحة والتوفيق.',
+  team: 'تقديراً لروح الفريق العالية التي أظهرتموها، وتعاونكم المثمر مع الزملاء، ومساهمتكم الفاعلة في إنجاح الأعمال المشتركة. نتمنى لكم دوام التوفيق.'
+};
+
+const LETTER_PRESETS = {
+  transfer: `بسم الله الرحمن الرحيم
+
+السلام عليكم ورحمة الله وبركاته، وبعد:
+
+أتشرف بالتقدم إلى سعادتكم بطلب نقل خدماتي من جهة عملي الحالية إلى الجهة التي ترونها مناسبة، وذلك لما تقتضيه مصلحة العمل وظروفي الشخصية.
+
+وأؤكد لسعادتكم أنني على أتم الاستعداد للالتزام بجميع الإجراءات والأنظمة المتبعة في هذا الشأن، وأنني سأبذل قصارى جهدي لخدمة الجهة الجديدة بما يحقق أهدافها.
+
+آمل من سعادتكم التكرم بالموافقة على طلبي هذا، ولكم مني خالص الشكر والتقدير.
+
+والسلام عليكم ورحمة الله وبركاته`,
+  leave: `بسم الله الرحمن الرحيم
+
+السلام عليكم ورحمة الله وبركاته، وبعد:
+
+أتقدم إلى سعادتكم بطلب الحصول على إجازة اضطرارية لمدة (......) أيام، وذلك لظروف خاصة بي.
+
+وأؤكد لسعادتكم أنني سأقوم بتسليم جميع المهام الموكلة إليّ قبل بدء الإجازة، وسأكون على تواصل مع جهة العمل في حال الحاجة إليّ.
+
+آمل من سعادتكم التكرم بالموافقة على طلبي هذا، ولكم مني خالص الشكر والتقدير.
+
+والسلام عليكم ورحمة الله وبركاته`,
+  salary: `بسم الله الرحمن الرحيم
+
+السلام عليكم ورحمة الله وبركاته، وبعد:
+
+أتقدم إلى سعادتكم بطلب صرف مستحقاتي المالية المتأخرة، والتي لم يتم صرفها منذ فترة رغم مراجعتي للجهات المختصة أكثر من مرة.
+
+وحرصاً مني على استقرار وضعي المالي، آمل من سعادتكم التكرم بالنظر في طلبي هذا وصرف مستحقاتي في أقرب وقت ممكن.
+
+لكم مني خالص الشكر والتقدير على حسن تعاونكم.
+
+والسلام عليكم ورحمة الله وبركاته`,
+  complaint: `بسم الله الرحمن الرحيم
+
+السلام عليكم ورحمة الله وبركاته، وبعد:
+
+أتقدم إلى سعادتكم بهذه الشكوى بخصوص المشكلة التي واجهتها مع (......)، والتي تمثلت في (......).
+
+وقد حاولت حل المشكلة بالطرق الودية دون جدوى، مما دفعني للتقدم إلى سعادتكم آملًا في إيجاد حل عادل ومرضٍ.
+
+آمل من سعادتكم التكرم بالنظر في شكواي هذه واتخاذ الإجراءات اللازمة، ولكم مني خالص الشكر والتقدير.
+
+والسلام عليكم ورحمة الله وبركاته`,
+  grievance: `بسم الله الرحمن الرحيم
+
+السلام عليكم ورحمة الله وبركاته، وبعد:
+
+أتقدم إلى سعادتكم بهذا التظلم بخصوص القرار الإداري الصادر بحقي برقم (......) وتاريخ (......)، والذي أرى فيه إجحافاً بحقي.
+
+وألتمس من سعادتكم إعادة النظر في هذا القرار، وذلك للأسباب التي أوضحتها لكم بالتفصيل، آملًا في تحقيق العدالة والإنصاف.
+
+لكم مني خالص الشكر والتقدير على حسن تعاونكم.
+
+والسلام عليكم ورحمة الله وبركاته`,
+  inquiry: `بسم الله الرحمن الرحيم
+
+السلام عليكم ورحمة الله وبركاته، وبعد:
+
+أتقدم إلى سعادتكم بهذا الخطاب للاستفسار عن (......).
+
+وآمل من سعادتكم التكرم بإفادتي بالمعلومات المطلوبة في أقرب وقت ممكن، وذلك لما لهذا الأمر من أهمية بالنسبة لي.
+
+لكم مني خالص الشكر والتقدير على حسن تعاونكم.
+
+والسلام عليكم ورحمة الله وبركاته`,
+  thanks: `بسم الله الرحمن الرحيم
+
+السلام عليكم ورحمة الله وبركاته، وبعد:
+
+يسرني أن أتقدم إلى سعادتكم بخالص الشكر والتقدير على ما قدمتموه لي من دعم ومساندة خلال فترة عملي.
+
+وأود أن أشير إلى أنني لمست من سعادتكم كل التقدير والاحترام، وهذا ما جعلني أعمل بكل جد وإخلاص. وأعتذر عن أي تقصير بدر مني.
+
+لكم مني خالص الشكر والتقدير، ودمتم موفقين.
+
+والسلام عليكم ورحمة الله وبركاته`
+};
+
+function applySummaryPreset() {
+  const key = document.getElementById('cv-summary-preset').value;
+  if (key && SUMMARY_PRESETS[key]) {
+    document.getElementById('cv-summary').value = SUMMARY_PRESETS[key];
+  }
+}
+
+function applyCertPreset() {
+  const key = document.getElementById('cert-reason-preset').value;
+  if (key && CERT_PRESETS[key]) {
+    document.getElementById('cert-reason').value = CERT_PRESETS[key];
+  }
+}
+
+function applyLetterPreset() {
+  const key = document.getElementById('ltr-body-preset').value;
+  if (key && LETTER_PRESETS[key]) {
+    document.getElementById('ltr-body').value = LETTER_PRESETS[key];
+  }
+}
+
+// ══════════════════════════════════════════
+//  PHOTO
+// ══════════════════════════════════════════
+function triggerPhoto() {
+  if (S.photoDataURL) return;
+  document.getElementById('photo-input').click();
+}
+
+function loadPhoto(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    S.photoDataURL = ev.target.result;
+    document.getElementById('photo-img').src = S.photoDataURL;
+    document.getElementById('photo-img').style.display = 'block';
+    document.getElementById('photo-placeholder-wrap').style.display = 'none';
+    document.getElementById('photo-remove-btn').style.display = 'block';
+    document.getElementById('photo-area').style.cursor = 'default';
+  };
+  reader.readAsDataURL(file);
+}
+
+function removePhoto() {
+  S.photoDataURL = null;
+  document.getElementById('photo-img').style.display = 'none';
+  document.getElementById('photo-placeholder-wrap').style.display = 'block';
+  document.getElementById('photo-remove-btn').style.display = 'none';
+  document.getElementById('photo-area').style.cursor = 'pointer';
+  document.getElementById('photo-input').value = '';
+}
+
+// ══════════════════════════════════════════
+//  SKILLS
+// ══════════════════════════════════════════
+function addSkillFromSel() {
+  const sel = document.getElementById('skill-sel');
+  if (!sel.value) return;
+  addSkillVal(sel.value);
+  sel.value = '';
+}
+function addSkill() {
+  const inp = document.getElementById('skill-input');
+  addSkillVal(inp.value);
+  inp.value = '';
+}
+function addSkillVal(v) {
+  v = v.trim();
+  if (!v || S.cv.skills.includes(v)) return;
+  S.cv.skills.push(v);
+  renderSkills();
+}
+function removeSkill(i) { S.cv.skills.splice(i,1); renderSkills(); }
+function renderSkills() {
+  document.getElementById('skills-tags').innerHTML = S.cv.skills.map((s,i) =>
+    `<div class="tag"><button class="remove-tag" onclick="removeSkill(${i})">×</button>${s}</div>`
+  ).join('');
+}
+
+// ══════════════════════════════════════════
+//  EXPERIENCES
+// ══════════════════════════════════════════
+const jobTitles = ['مشرف فنيي المختبر','فني مختبر','طبيب','صيدلاني','ممرض','أخصائي أشعة','إداري','محاسب','مهندس','معلم','مدير مشروع'];
+const orgNames = ['مستشفى سبت العلايا العام','تجمع عسير الصحي','وزارة الصحة','مستشفى أبها المركزي','المستشفى العسكري بأبها','وزارة التعليم','القطاع الخاص'];
+const years = Array.from({length:30},(_,i)=>(2025-i).toString());
+
+function addExp() {
+  const id = Date.now();
+  S.cv.experiences.push({id,job:'',org:'',from:'',to:'حتى الآن',desc:''});
+  renderExps();
+}
+function removeExp(id) { S.cv.experiences = S.cv.experiences.filter(e=>e.id!==id); renderExps(); }
+function upExp(id,k,v) { const e=S.cv.experiences.find(x=>x.id===id); if(e) e[k]=v; }
+function renderExps() {
+  document.getElementById('exp-list').innerHTML = S.cv.experiences.map(e => `
+    <div class="exp-entry">
+      <button class="remove-exp" onclick="removeExp(${e.id})">✕ حذف</button>
+      <div class="form-group"><label>المسمى الوظيفي</label>
+        <select onchange="upExp(${e.id},'job',this.value)" style="margin-bottom:4px">
+          <option value="">— اختر —</option>
+          ${jobTitles.map(j=>`<option${e.job===j?' selected':''}>${j}</option>`).join('')}
+          <option value="__c">اكتب مسمى آخر...</option>
+        </select>
+        <input type="text" value="${e.job}" onchange="upExp(${e.id},'job',this.value)" placeholder="أو اكتب المسمى">
+      </div>
+      <div class="form-group"><label>جهة العمل</label>
+        <select onchange="upExp(${e.id},'org',this.value)" style="margin-bottom:4px">
+          <option value="">— اختر —</option>
+          ${orgNames.map(o=>`<option${e.org===o?' selected':''}>${o}</option>`).join('')}
+          <option value="__c">اكتب جهة أخرى...</option>
+        </select>
+        <input type="text" value="${e.org}" onchange="upExp(${e.id},'org',this.value)" placeholder="أو اكتب اسم الجهة">
+      </div>
+      <div class="row-2">
+        <div class="form-group"><label>من سنة</label>
+          <select onchange="upExp(${e.id},'from',this.value)">
+            <option value="">— اختر —</option>
+            ${years.map(y=>`<option${e.from===y?' selected':''}>${y}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group"><label>إلى سنة</label>
+          <select onchange="upExp(${e.id},'to',this.value)">
+            <option value="حتى الآن"${e.to==='حتى الآن'?' selected':''}>حتى الآن</option>
+            ${years.map(y=>`<option${e.to===y?' selected':''}>${y}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label>المهام والإنجازات</label>
+        <textarea rows="2" onchange="upExp(${e.id},'desc',this.value)" placeholder="أبرز مهامك وإنجازاتك...">${e.desc}</textarea>
+      </div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════
+//  EDUCATION
+// ══════════════════════════════════════════
+const degrees = ['بكالوريوس','دبلوم عالٍ','ماجستير','دكتوراه','دبلوم','شهادة ثانوية','بورد تخصصي'];
+const majors = ['علوم المختبرات الطبية','الطب البشري','الصيدلة','التمريض','الأشعة','التخدير','إدارة المستشفيات','المحاسبة','الهندسة','علوم الحاسب','إدارة الأعمال','التربية والتعليم'];
+const universities = ['جامعة الملك خالد','جامعة الملك عبدالعزيز','جامعة الملك سعود','جامعة الملك فيصل','جامعة أم القرى','جامعة الطائف','جامعة جازان','الكلية التقنية بأبها','معهد الأمير سلطان للقلب'];
+
+function addEdu() {
+  const id = Date.now();
+  S.cv.educations.push({id,degree:'',school:'',year:'',major:''});
+  renderEdus();
+}
+function removeEdu(id) { S.cv.educations = S.cv.educations.filter(e=>e.id!==id); renderEdus(); }
+function upEdu(id,k,v) { const e=S.cv.educations.find(x=>x.id===id); if(e) e[k]=v; }
+function renderEdus() {
+  document.getElementById('edu-list').innerHTML = S.cv.educations.map(e => `
+    <div class="exp-entry">
+      <button class="remove-exp" onclick="removeEdu(${e.id})">✕ حذف</button>
+      <div class="row-2">
+        <div class="form-group"><label>الدرجة العلمية</label>
+          <select onchange="upEdu(${e.id},'degree',this.value)">
+            <option value="">— اختر —</option>
+            ${degrees.map(d=>`<option${e.degree===d?' selected':''}>${d}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group"><label>سنة التخرج</label>
+          <select onchange="upEdu(${e.id},'year',this.value)">
+            <option value="">— اختر —</option>
+            ${years.map(y=>`<option${e.year===y?' selected':''}>${y}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label>الجامعة / المعهد</label>
+        <select onchange="upEdu(${e.id},'school',this.value)" style="margin-bottom:4px">
+          <option value="">— اختر —</option>
+          ${universities.map(u=>`<option${e.school===u?' selected':''}>${u}</option>`).join('')}
+          <option value="__c">اكتب اسم المؤسسة...</option>
+        </select>
+        <input type="text" value="${e.school}" onchange="upEdu(${e.id},'school',this.value)" placeholder="أو اكتب اسم المؤسسة التعليمية">
+      </div>
+      <div class="form-group"><label>التخصص</label>
+        <select onchange="upEdu(${e.id},'major',this.value)" style="margin-bottom:4px">
+          <option value="">— اختر —</option>
+          ${majors.map(m=>`<option${e.major===m?' selected':''}>${m}</option>`).join('')}
+          <option value="__c">اكتب التخصص...</option>
+        </select>
+        <input type="text" value="${e.major}" onchange="upEdu(${e.id},'major',this.value)" placeholder="أو اكتب التخصص">
+      </div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════
+//  COURSES
+// ══════════════════════════════════════════
+const courseNames = ['ACLS - الإسعاف القلبي المتقدم','BLS - الإنعاش القلبي الرئوي','PALS - دعم الحياة للأطفال','دورة جودة المختبرات','دورة ضبط الجودة المختبرية','دورة الوساطة وفض النزاعات','دورة القيادة الإدارية','دورة الحماية من الحرائق','دورة Microsoft Office المتقدم','دورة مكافحة العدوى','دورة خدمة العملاء','دورة البرمجة اللغوية العصبية'];
+const courseIssuers = ['المركز السعودي للاعتماد الصحي (CBAHI)','وزارة الصحة','تجمع عسير الصحي','الهيئة السعودية للتخصصات الصحية','المركز الوطني لتنمية القطاع غير الربحي','معهد الإدارة العامة','جامعة الملك خالد','مركز تدريب محلي'];
+
+function addCourse() {
+  const id = Date.now();
+  S.cv.courses.push({id,name:'',issuer:'',year:''});
+  renderCourses();
+}
+function removeCourse(id) { S.cv.courses = S.cv.courses.filter(c=>c.id!==id); renderCourses(); }
+function upCourse(id,k,v) { const c=S.cv.courses.find(x=>x.id===id); if(c) c[k]=v; }
+function renderCourses() {
+  document.getElementById('course-list').innerHTML = S.cv.courses.map(c => `
+    <div class="exp-entry">
+      <button class="remove-exp" onclick="removeCourse(${c.id})">✕ حذف</button>
+      <div class="form-group"><label>اسم الدورة / الشهادة</label>
+        <select onchange="upCourse(${c.id},'name',this.value)" style="margin-bottom:4px">
+          <option value="">— اختر —</option>
+          ${courseNames.map(n=>`<option${c.name===n?' selected':''}>${n}</option>`).join('')}
+          <option value="__c">اكتب اسم آخر...</option>
+        </select>
+        <input type="text" value="${c.name}" onchange="upCourse(${c.id},'name',this.value)" placeholder="أو اكتب اسم الدورة">
+      </div>
+      <div class="row-2">
+        <div class="form-group"><label>الجهة المانحة</label>
+          <select onchange="upCourse(${c.id},'issuer',this.value)" style="margin-bottom:4px">
+            <option value="">— اختر —</option>
+            ${courseIssuers.map(i=>`<option${c.issuer===i?' selected':''}>${i}</option>`).join('')}
+            <option value="__c">اكتب الجهة...</option>
+          </select>
+          <input type="text" value="${c.issuer}" onchange="upCourse(${c.id},'issuer',this.value)" placeholder="الجهة المانحة">
+        </div>
+        <div class="form-group"><label>السنة</label>
+          <select onchange="upCourse(${c.id},'year',this.value)">
+            <option value="">— اختر —</option>
+            ${years.slice(0,15).map(y=>`<option${c.year===y?' selected':''}>${y}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════
+//  PREVIEWS
+// ══════════════════════════════════════════
+function switchTab(id) {
+  ['cv','cert','letter','summary'].forEach((t,i) => {
+    document.querySelectorAll('.tab-btn')[i].classList.toggle('active', t === id);
+  });
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+}
+
+function showSummary(type) {
+  activeDoc = type;
+  document.querySelectorAll('.sum-tab').forEach((b,i) =>
+    b.classList.toggle('active', ['cv','cert','letter'][i] === type));
+  ['cv','cert','letter'].forEach(t =>
+    document.getElementById(t + '-preview').style.display = t === type ? 'block' : 'none');
+  if (type === 'cv') buildCV();
+  else if (type === 'cert') buildCert();
+  else buildLetter();
+}
+
+// ── CV PREVIEW ──
+function buildCV() {
+  const name = gv('cv-name') || 'الاسم الكامل';
+  const job = getComboVal('cv-jobtitle') || gv('cv-jobtitle') || 'المسمى الوظيفي';
+  const phone = gv('cv-phone');
+  const email = gv('cv-email');
+  const city = getComboVal('cv-city') || gv('cv-city');
+  const nat = getComboVal('cv-nationality') || gv('cv-nationality');
+  const summary = gv('cv-summary');
+
+  const photoHTML = S.photoDataURL
+    ? `<img src="${S.photoDataURL}" class="cv-hdr-photo" alt="صورة شخصية">`
+    : `<div class="cv-hdr-photo-placeholder">👤</div>`;
+
+  const contacts = [phone&&`📞 ${phone}`, email&&`✉️ ${email}`, city&&`📍 ${city}`, nat&&`🆔 ${nat}`].filter(Boolean);
+
+  const expsHTML = S.cv.experiences.length ? `
+    <div class="cv-sec">
+      <div class="cv-sec-title">الخبرات الوظيفية</div>
+      ${S.cv.experiences.map(e=>`
+        <div class="cv-item">
+          <div class="cv-item-hd">${e.job||'—'}</div>
+          <div class="cv-item-sub">${e.org||''} ${e.from||e.to ? '| '+[e.from,e.to].filter(Boolean).join(' – ') : ''}</div>
+          ${e.desc?`<div class="cv-item-desc">${e.desc}</div>`:''}
+        </div>`).join('')}
+    </div>` : '';
+
+  const edusHTML = S.cv.educations.length ? `
+    <div class="cv-sec">
+      <div class="cv-sec-title">المؤهلات العلمية</div>
+      ${S.cv.educations.map(e=>`
+        <div class="cv-item">
+          <div class="cv-item-hd">${e.degree||'—'} ${e.major?'| '+e.major:''}</div>
+          <div class="cv-item-sub">${e.school||''} ${e.year?'| '+e.year:''}</div>
+        </div>`).join('')}
+    </div>` : '';
+
+  const skillsHTML = S.cv.skills.length ? `
+    <div class="cv-sec">
+      <div class="cv-sec-title">المهارات والكفاءات</div>
+      <div class="cv-skills-grid">${S.cv.skills.map(s=>`<span class="cv-skill-tag">${s}</span>`).join('')}</div>
+    </div>` : '';
+
+  const coursesHTML = S.cv.courses.length ? `
+    <div class="cv-sec">
+      <div class="cv-sec-title">الدورات والشهادات</div>
+      ${S.cv.courses.map(c=>`
+        <div class="cv-item">
+          <div class="cv-item-hd">${c.name||'—'}</div>
+          <div class="cv-item-sub">${c.issuer||''} ${c.year?'| '+c.year:''}</div>
+        </div>`).join('')}
+    </div>` : '';
+
+  document.getElementById('cv-preview').innerHTML = `
+    <div class="cv-wrap">
+      <div class="cv-hdr">
+        ${photoHTML}
+        <div class="cv-hdr-info">
+          <div class="cv-hdr-name">${name}</div>
+          <div class="cv-hdr-title">${job}</div>
+          ${contacts.length ? `<div class="cv-hdr-contacts">${contacts.map(c=>`<span class="cv-hdr-contact">${c}</span>`).join('')}</div>` : ''}
+        </div>
+      </div>
+      <div class="cv-body">
+        ${summary?`<div class="cv-sec"><div class="cv-sec-title">الملخص المهني</div><div class="cv-item-desc">${summary}</div></div>`:''}
+        ${expsHTML}${edusHTML}${skillsHTML}${coursesHTML}
+      </div>
+    </div>`;
+}
+
+// ── CERTIFICATE PREVIEW ──
+function buildCert() {
+  const org = getComboVal('cert-org') || gv('cert-org') || 'الجهة';
+  const logo = getComboVal('cert-logo') || gv('cert-logo') || '🏅';
+  const recip = gv('cert-recipient') || 'اسم المُكرَّم';
+  const recipJob = getComboVal('cert-recipient-job') || gv('cert-recipient-job');
+  const reason = gv('cert-reason') || 'تقديرًا للجهود المتميزة والعطاء المستمر.';
+  const type = gv('cert-type') || 'شكر وتقدير';
+  const signer = gv('cert-signer') || 'اسم الموقّع';
+  const signerTitle = getComboVal('cert-signer-title') || gv('cert-signer-title') || 'المدير العام';
+  const dateVal = gv('cert-date');
+  const hijri = gv('cert-hijri');
+  const dateStr = dateVal ? new Date(dateVal).toLocaleDateString('ar-SA',{year:'numeric',month:'long',day:'numeric'}) : '';
+
+  document.getElementById('cert-preview').innerHTML = `
+    <div class="cert-wrap">
+      <div class="cert-outer">
+        <span class="cert-corner tl">✦</span>
+        <span class="cert-corner tr">✦</span>
+        <span class="cert-corner bl">✦</span>
+        <span class="cert-corner br">✦</span>
+        <div class="cert-inner">
+          <div class="cert-logo-lrg">${logo}</div>
+          <div class="cert-org-name">${org}</div>
+          <div class="cert-divider"></div>
+          <div class="cert-badge">شهادة ${type}</div>
+          <div class="cert-text">تُقدِّم <strong>${org}</strong> هذه الشهادة إلى</div>
+          <div class="cert-recip-name">${recip}</div>
+          ${recipJob?`<div class="cert-recip-job">${recipJob}</div>`:''}
+          <div class="cert-reason-text">${reason}</div>
+          <div class="cert-ornament">— ✦ ✦ ✦ —</div>
+          <div class="cert-footer">
+            <div class="cert-date-block">
+              ${dateStr?`<div>📅 ${dateStr}</div>`:''}
+              ${hijri?`<div>${hijri}</div>`:''}
+            </div>
+            <div class="cert-sig">
+              <div class="cert-sig-line"></div>
+              <div class="cert-sig-name">${signer}</div>
+              <div class="cert-sig-role">${signerTitle}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── LETTER PREVIEW ──
+function buildLetter() {
+  const name = gv('ltr-name') || 'اسم مُقدِّم الخطاب';
+  const idNum = gv('ltr-id');
+  const phone = gv('ltr-phone');
+  const city = getComboVal('ltr-city') || gv('ltr-city');
+  const empStatus = gv('ltr-emp-status');
+  const workOrg = gv('ltr-work-org');
+  const dateVal = gv('ltr-date');
+  const dateStr = dateVal ? new Date(dateVal).toLocaleDateString('ar-SA',{year:'numeric',month:'long',day:'numeric'}) : '';
+  const toOrg = getComboVal('ltr-to-type') || gv('ltr-to-type') || 'الجهة المعنية';
+  const toTitle = getComboVal('ltr-to-title') || gv('ltr-to-title') || '';
+  const subject = getComboVal('ltr-subject') || gv('ltr-subject') || gv('ltr-type');
+  const type = gv('ltr-type');
+  const body = gv('ltr-body') || '[يرجى كتابة أو اختيار نص الخطاب]';
+
+  const senderDetails = [
+    idNum && `رقم الهوية: ${idNum}`,
+    phone && `الجوال: ${phone}`,
+    city && `المدينة: ${city}`,
+    empStatus && empStatus,
+    workOrg && `جهة العمل: ${workOrg}`
+  ].filter(Boolean);
+
+  document.getElementById('letter-preview').innerHTML = `
+    <div class="ltr-wrap">
+      <div class="ltr-top-bar">
+        <div>
+          <div class="ltr-sender-name">${name}</div>
+          ${senderDetails.map(d=>`<div class="ltr-sender-id">${d}</div>`).join('')}
+        </div>
+        <div class="ltr-meta">
+          ${dateStr?`<div>${dateStr}</div>`:''}
+        </div>
+      </div>
+      <div class="ltr-body-pad">
+        <div class="ltr-bismillah">بسم الله الرحمن الرحيم</div>
+        <div class="ltr-to-block">
+          <div class="ltr-to-label">إلى</div>
+          <div class="ltr-to-val">${toTitle ? toTitle + ' /' : ''} ${toOrg}</div>
+        </div>
+        <div class="ltr-subject-box">
+          <span class="ltr-subject-label">الموضوع: ${type}</span>
+          <div class="ltr-subject-val">${subject}</div>
+        </div>
+        <div class="ltr-body-text">${body}</div>
+        <div class="ltr-sig-block">
+          <div class="ltr-sig-line"></div>
+          <div class="ltr-sig-name">${name}</div>
+          <div class="ltr-sig-details">
+            ${idNum?`رقم الهوية: ${idNum}<br>`:''}
+            ${phone?`الجوال: ${phone}<br>`:''}
+            ${dateStr?`التاريخ: ${dateStr}`:''}
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ══════════════════════════════════════════
+//  PRINT (مع ربط الشعار الرسمي)
+// ══════════════════════════════════════════
+function printDoc() {
+  const id = activeDoc === 'cv' ? 'cv-preview' : activeDoc === 'cert' ? 'cert-preview' : 'letter-preview';
+  const content = document.getElementById(id).innerHTML;
+  const w = window.open('', '_blank');
+  w.document.write(`<!DOCTYPE html><html lang="ar" dir="rtl"><head>
+<meta charset="UTF-8"><title>طباعة</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Cairo','Noto Naskh Arabic',sans-serif;direction:rtl;background:#fff;color:#1a1a2e}
+@page{margin:12mm 14mm}
+
+/* ═══ الشعار الرسمي في رأس الصفحة المطبوعة ═══ */
+.print-logo-container {
+  width: 100%;
+  text-align: center;
+  padding: 10px 0 15px 0;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #1e3a5f;
+}
+.print-logo-container img {
+  max-width: 100%;
+  height: auto;
+  max-height: 80px;
+  object-fit: contain;
+}
+
+/* CV */
+.cv-wrap{background:#fff;font-family:'Cairo','Noto Naskh Arabic',sans-serif;direction:rtl;color:#1a1a2e}
+.cv-hdr{background:#1e3a5f!important;color:#fff!important;padding:22px 24px 18px;display:flex;gap:18px;align-items:flex-start;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.cv-hdr-photo{width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid #c8a96e;flex-shrink:0}
+.cv-hdr-photo-placeholder{width:80px;height:80px;border-radius:50%;background:rgba(200,169,110,.2)!important;border:3px solid #c8a96e;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:28px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.cv-hdr-name{font-size:20px;font-weight:900;color:#c8a96e!important}
+.cv-hdr-title{font-size:12px;color:rgba(255,255,255,.85)!important;margin-top:4px}
+.cv-hdr-contacts{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.cv-hdr-contact{font-size:11px;color:rgba(255,255,255,.8)!important}
+.cv-body{padding:14px 18px}
+.cv-sec{margin-bottom:14px;page-break-inside:avoid}
+.cv-sec-title{font-size:11px;font-weight:700;color:#1e3a5f;border-bottom:2px solid #c8a96e;padding-bottom:4px;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.cv-item{margin-bottom:8px}
+.cv-item-hd{font-size:12px;font-weight:700;color:#1e3a5f}
+.cv-item-sub{font-size:11px;color:#555;margin-top:2px}
+.cv-item-desc{font-size:11px;color:#333;margin-top:3px;line-height:1.6}
+.cv-skills-grid{display:flex;flex-wrap:wrap;gap:5px}
+.cv-skill-tag{padding:2px 9px;background:#eef2f8!important;border:1px solid #c8d4e8;border-radius:20px;font-size:10px;color:#1e3a5f;font-weight:600;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+/* Certificate */
+.cert-wrap{background:#fff;font-family:'Noto Naskh Arabic','Cairo',sans-serif;direction:rtl;padding:20px}
+.cert-outer{border:3px solid #c8a96e;border-radius:12px;padding:16px;position:relative;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.cert-inner{border:1px solid rgba(200,169,110,.35);border-radius:8px;padding:16px;text-align:center}
+.cert-corner{position:absolute;font-size:18px;color:rgba(200,169,110,.6)}
+.cert-corner.tl{top:8px;right:8px}.cert-corner.tr{top:8px;left:8px}
+.cert-corner.bl{bottom:8px;right:8px}.cert-corner.br{bottom:8px;left:8px}
+.cert-logo-lrg{font-size:36px;margin-bottom:4px}
+.cert-org-name{font-size:14px;font-weight:700;color:#1e3a5f}
+.cert-divider{width:70px;height:2px;background:#c8a96e;margin:10px auto;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.cert-badge{font-size:18px;font-weight:900;color:#c8a96e;letter-spacing:2px;margin-bottom:12px}
+.cert-text{font-size:13px;color:#333;line-height:2}
+.cert-recip-name{font-size:20px;font-weight:700;color:#1e3a5f;border-bottom:2px solid #c8a96e;padding-bottom:2px;display:inline-block;margin:4px 0 2px}
+.cert-recip-job{font-size:11px;color:#555;margin-bottom:8px}
+.cert-reason-text{font-size:12px;color:#333;line-height:1.9;background:#fffdf7!important;border-right:3px solid #c8a96e;padding:8px 12px;border-radius:0 6px 6px 0;text-align:right;margin:8px 0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.cert-ornament{font-size:14px;color:rgba(200,169,110,.6);letter-spacing:6px;margin:6px 0}
+.cert-footer{display:flex;justify-content:space-between;align-items:flex-end;margin-top:16px;padding-top:10px;border-top:1px solid rgba(200,169,110,.25)}
+.cert-sig{text-align:center}
+.cert-sig-line{width:90px;height:1px;background:#aaa;margin:22px auto 4px}
+.cert-sig-name{font-size:11px;font-weight:700;color:#1e3a5f}
+.cert-sig-role{font-size:10px;color:#777}
+.cert-date-block{text-align:center;font-size:10px;color:#555;line-height:1.8}
+/* Letter */
+.ltr-wrap{background:#fff;font-family:'Noto Naskh Arabic','Cairo',sans-serif;direction:rtl;color:#1a1a2e}
+.ltr-top-bar{background:#1e3a5f!important;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.ltr-sender-name{font-size:14px;font-weight:700;color:#c8a96e!important}
+.ltr-sender-id{font-size:10px;color:rgba(255,255,255,.75)!important;margin-top:2px}
+.ltr-meta{text-align:left;font-size:10px;color:rgba(255,255,255,.7)!important;line-height:1.8}
+.ltr-body-pad{padding:16px 20px}
+.ltr-bismillah{text-align:center;font-size:14px;color:#1e3a5f;margin-bottom:12px;font-weight:600}
+.ltr-to-block{background:#f7f4ef!important;border-right:3px solid #c8a96e;padding:8px 12px;border-radius:0 6px 6px 0;margin-bottom:12px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.ltr-to-label{font-size:10px;color:#777;margin-bottom:2px}
+.ltr-to-val{font-size:12px;font-weight:700;color:#1e3a5f}
+.ltr-subject-box{background:#f0eee8!important;border:1px solid rgba(200,169,110,.4);border-radius:6px;padding:8px 12px;text-align:center;margin-bottom:14px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.ltr-subject-label{font-size:10px;color:#777;display:block;margin-bottom:2px}
+.ltr-subject-val{font-size:13px;font-weight:700;color:#1e3a5f}
+.ltr-body-text{font-size:13px;color:#111;line-height:2.1;margin-bottom:18px;text-align:justify;white-space:pre-wrap}
+.ltr-sig-block{text-align:right;padding-top:6px}
+.ltr-sig-line{width:100px;height:1px;background:#bbb;margin:20px 0 5px auto}
+.ltr-sig-name{font-size:12px;font-weight:700;color:#1e3a5f}
+.ltr-sig-details{font-size:11px;color:#555;line-height:1.8}
+</style></head><body>
+<!-- الشعار الرسمي في رأس الصفحة المطبوعة -->
+<div class="print-logo-container">
+  <img src="logo.svg" alt="شعار تجمع عسير الصحي">
+</div>
+${content}
+</body></html>`);
+  w.document.close();
+  w.focus();
+  setTimeout(() => w.print(), 900);
+}
+
+// ══════════════════════════════════════════
+//  WHATSAPP
+// ══════════════════════════════════════════
+function shareWhatsApp() {
+  const id = activeDoc === 'cv' ? 'cv-preview' : activeDoc === 'cert' ? 'cert-preview' : 'letter-preview';
+  const el = document.getElementById(id);
+  const text = (el.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 1500);
+  const labels = {cv:'👤 السيرة الذاتية', cert:'🏅 شهادة الشكر', letter:'✉️ الخطاب الرسمي'};
+  const msg = `${labels[activeDoc]}\n\n${text}\n\n— مُحرِّر الوثائق الذكي - تجمع عسير الصحي`;
+  window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
+}
+
+// ══════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  renderExps(); renderEdus(); renderCourses(); renderSkills();
+  document.getElementById('cert-date').valueAsDate = new Date();
+  document.getElementById('ltr-date').valueAsDate = new Date();
+});
+</script>
+</body>
+</html>
